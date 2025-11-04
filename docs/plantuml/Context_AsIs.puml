@@ -1,0 +1,28 @@
+@startuml
+title SmartHome Context Diagram
+
+top to bottom direction
+
+!include <C4/C4_Context>
+
+Person(user, "User", "A user of the smart_home app")
+Person(admin, "Admin", "An admin of the smart_home app")
+System_Boundary(c1, "smart_home") {
+    System(sensorManagingSystem, "Sensor Managing", "System managing sensors")
+    System(temperatureMonitoringSystem, "Temperature Monitoring", "System monitoring temperature")
+    System(thirdPartyIntegrationSystem, "Third-Party Integration", "Integration layer for third-party APIs")
+    System(telemetrySystem, "Smart_Home Telemetry", "Telemetry for smart_home system")
+}
+
+System_Ext(temperatureApi, "Third-Party API", "External API for fetching temperature")
+System_Ext(sensor, "Sensor", "Physical temperature sensor")
+
+Rel(user, sensorManagingSystem, "Enable/disable heating, set temperature")
+Rel(admin, sensorManagingSystem, "Register sensors in the system (CRUD)")
+Rel(admin, telemetrySystem, "Monitors system state")
+Rel(user, temperatureMonitoringSystem, "Request temperature by sensor ID/location")
+Rel(temperatureMonitoringSystem, thirdPartyIntegrationSystem, "Request temperature by sensor ID/location")
+Rel(thirdPartyIntegrationSystem, temperatureApi, "Request temperature by sensor ID/location")
+Rel(temperatureApi, sensor, "Fetch temperature from sensor")
+
+@enduml

@@ -1,0 +1,61 @@
+@startuml
+title SmartHome Container Diagram
+
+!include <C4/C4_Container>
+'LAYOUT_LANDSCAPE()
+
+Person(user, "User", "Пользователь умного дома")
+
+Boundary(smartHomeSystem, "Smart_Home System") {
+    Boundary(frontend, "Frontend") {
+        Container(mobileApp, "Мобильное приложение", "Пользовательский интерфейс")
+        Container(webApp, "Веб-приложение", "Пользовательский интерфейс")
+    }
+    Container(loadBalancer, "Балансировщик нагрузки", "Балансирует соединения")
+    Boundary(manageUsersSystem, "Управление пользователями") {
+        Container(userManagement, "Управление пользователями", "Создание/редактирование пользователей, редактирование прав")
+        ContainerDb(usersDb, "Users DB", "Хранит пользователей, хэшированные данные для авторизации, логи доступа и т.д.")
+        Container(sessionManagement, "Управление сессией", "Управление пользовательской сессией, контроль доступа")
+        ContainerDb(sessionDb, "Хранилище сессий", "Хранит активные сессии пользователей")
+    }
+    Boundary(manageScenarios, "Управление сценариями") {
+        Container(scenarioEngine, "Движок сценариев", "Исполняет сценарии, читает состояние и отдает команды устройствам")
+        Container(scenarioManagement, "Управление сценариями", "Создание/редактирование сценариев")
+        ContainerDb(scenariosDb, "Scenarios DB", "Хранит сценарии")
+    }
+    Boundary(manageDevices, "Управление устройствами") {
+        Container(deviceManagement, "Управление устройствами", "Создание/удаление устройств, изменение состояния, получение данных")
+        ContainerDb(devicesDb, "Devices DB", "Хранит информацию об устройствах")
+    }
+    Boundary(manageLocations, "Управление локациями") {
+        Container(locationManagement, "Управление локациями", "Создание/редактирование локаций")
+        ContainerDb(locationsDb, "Locations DB", "Хранит информацию о локациях")
+    }
+}
+Container_Ext(externalApi, "Third-Party API", "Внешняя экосистема стороннего поставщика")
+
+Rel(user, mobileApp, "Авторизуется, управляет умным домом, получает уведомления")
+Rel(user, webApp, "Авторизуется, управляет умным домом, получает уведомления")
+
+Rel(mobileApp, loadBalancer, "Перенаправляет запросы")
+Rel(webApp, loadBalancer, "Перенаправляет запросы")
+Rel(loadBalancer, userManagement, "Создает учетную запись")
+Rel(loadBalancer, sessionManagement, "Авторизуется и получает сессию")
+Rel(loadBalancer, scenarioManagement, "Создает и редактирует сценарии")
+Rel(loadBalancer, locationManagement, "Создает и редактирует локации (дома, комнаты)")
+Rel(loadBalancer, deviceManagement, "Добавляет новые устройства, управляет устройствами, получает данные")
+
+Rel(scenarioEngine, deviceManagement, "Управляет устройствами, получает от устройств их показания, состояние")
+Rel(scenarioEngine, locationManagement, "Получает локации")
+Rel(scenarioEngine, scenarioManagement, "Получает сценарии")
+
+Rel(deviceManagement, externalApi, "Отправляет на устройства команды, читает их данные и состояния")
+Rel(userManagement, usersDb, "CRUD users")
+Rel(sessionManagement, usersDb, "Аутентификация и авторизация, хранение журнала доступа")
+Rel(sessionManagement, sessionDb, "Сохраняет/читает пользовательскую сессию")
+Rel(scenarioManagement, scenariosDb, "CRUD сценарии")
+Rel(locationManagement, locationsDb, "Хранит локации")
+Rel(deviceManagement, devicesDb, "Сохраняет устройства и их состояние")
+
+SHOW_LEGEND()
+@enduml
