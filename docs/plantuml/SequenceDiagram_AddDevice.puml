@@ -1,0 +1,30 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+== Добавление нового устройства ==
+
+actor User as user
+participant API as api
+participant SessionManagement as session
+participant ServiceLayer as service
+queue CommandQueue as q
+participant CommandProcessor as processor
+participant ExternalApi as extApi
+participant RepositoryLayer as repository
+
+user -> api++: Добавить устройство
+api -> session++: Проверка авторизации
+session -->> api--: Ok
+api -> service++: Добавить устройство
+service ->> q: Добавить устройство
+q -> processor++: Добавить устройство
+processor -> extApi++: Добавить устройство
+extApi -->> processor--: Устройство добавлено
+processor -->> service--: Устройство добавлено
+service -> repository++: Запись устройства в БД
+repository -->> service--: Устройство сохранено
+service -->> api--: Устройство добавлено
+api -->> user--: Устройство добавлено
+@enduml

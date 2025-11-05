@@ -1,0 +1,37 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+== Чтение показаний устройства ==
+
+actor User as user
+participant API as api
+participant SessionManagement as session
+participant ServiceLayer as service
+participant DeviceMonitor as monitor
+queue QueryQueue as q
+participant QueryProcessor as processor
+participant ExternalApi as extApi
+participant RepositoryLayer as repository
+
+user -> api++: Прочитать показания\n устройства с deviceId
+api -> session++: Проверка авторизации
+session -->> api--: Ok
+api -> service++: Прочитать показания\n устройства с deviceId
+service -> repository++: Прочесть показания\n устройства с deviceId из БД
+repository -->> service--: Показания устройства
+service -->> api--++: Показания устройства
+api -->> user--: Показания устройства
+group Фоновый процесс обновления показаний
+    monitor ->> q: Прочитать показания\n устройства с deviceId
+    q -> processor++: Прочитать показания\n устройства с deviceId
+    processor -> extApi++: Прочитать показания
+    extApi -->> processor--: Показания устройства
+    processor -->> monitor--++: Показания устройства
+    monitor -> repository++: Запись показаний в БД
+    repository -->> monitor--: Показания сохранены
+end
+
+
+@enduml

@@ -5,13 +5,19 @@ title SmartHome Container Diagram
 'LAYOUT_LANDSCAPE()
 
 Person(user, "User", "Пользователь умного дома")
+Person(admin, "Admin", "Администратор")
 
 Boundary(smartHomeSystem, "Smart_Home System") {
     Boundary(frontend, "Frontend") {
         Container(mobileApp, "Мобильное приложение", "Пользовательский интерфейс")
         Container(webApp, "Веб-приложение", "Пользовательский интерфейс")
+        Container(backofficeApp, "Веб-приложение администратора", "Административный интерфейс")
     }
     Container(loadBalancer, "Балансировщик нагрузки", "Балансирует соединения")
+    Boundary(manageVendorsSystem, "Управление вендорами") {
+        Container(vendorManagement, "Управление вендорами", "CRUD-операции для списка вендоров")
+        ContainerDb(vendorsDb, "Vendors DB", "Хранит список вендоров")
+    }
     Boundary(manageUsersSystem, "Управление пользователями") {
         Container(userManagement, "Управление пользователями", "Создание/редактирование пользователей, редактирование прав")
         ContainerDb(usersDb, "Users DB", "Хранит пользователей, хэшированные данные для авторизации, логи доступа и т.д.")
@@ -34,16 +40,20 @@ Boundary(smartHomeSystem, "Smart_Home System") {
 }
 Container_Ext(externalApi, "Third-Party API", "Внешняя экосистема стороннего поставщика")
 
+Rel(admin, backofficeApp, "Авторизуется, управляет списком вендоров, пользователей")
 Rel(user, mobileApp, "Авторизуется, управляет умным домом, получает уведомления")
 Rel(user, webApp, "Авторизуется, управляет умным домом, получает уведомления")
 
 Rel(mobileApp, loadBalancer, "Перенаправляет запросы")
 Rel(webApp, loadBalancer, "Перенаправляет запросы")
+Rel(backofficeApp, loadBalancer, "Перенаправляет запросы")
+
 Rel(loadBalancer, userManagement, "Создает учетную запись")
 Rel(loadBalancer, sessionManagement, "Авторизуется и получает сессию")
 Rel(loadBalancer, scenarioManagement, "Создает и редактирует сценарии")
 Rel(loadBalancer, locationManagement, "Создает и редактирует локации (дома, комнаты)")
 Rel(loadBalancer, deviceManagement, "Добавляет новые устройства, управляет устройствами, получает данные")
+Rel(loadBalancer, vendorManagement, "Добавляет и редактирует вендоров")
 
 Rel(scenarioEngine, deviceManagement, "Управляет устройствами, получает от устройств их показания, состояние")
 Rel(scenarioEngine, locationManagement, "Получает локации")
@@ -56,6 +66,7 @@ Rel(sessionManagement, sessionDb, "Сохраняет/читает пользо�
 Rel(scenarioManagement, scenariosDb, "CRUD сценарии")
 Rel(locationManagement, locationsDb, "Хранит локации")
 Rel(deviceManagement, devicesDb, "Сохраняет устройства и их состояние")
+Rel(vendorManagement, vendorsDb, "Сохраняет список вендоров")
 
 SHOW_LEGEND()
 @enduml
