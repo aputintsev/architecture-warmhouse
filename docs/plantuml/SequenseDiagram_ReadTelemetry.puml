@@ -12,6 +12,7 @@ participant ServiceLayer as service
 participant DeviceMonitor as monitor
 queue QueryQueue as q
 participant QueryProcessor as processor
+participant ApiConverter as converter
 participant ExternalApi as extApi
 participant RepositoryLayer as repository
 
@@ -26,6 +27,8 @@ api -->> user--: Показания устройства
 group Фоновый процесс обновления показаний
     monitor ->> q: Прочитать показания\n устройства с deviceId
     q -> processor++: Прочитать показания\n устройства с deviceId
+    processor -> converter++: Преобразовать команду в \nформат вендора
+    converter -->> processor--: Команда, понятная вендору
     processor -> extApi++: Прочитать показания
     extApi -->> processor--: Показания устройства
     processor -->> monitor--++: Показания устройства

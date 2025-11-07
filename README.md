@@ -70,19 +70,42 @@
 
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+[plantuml](/docs/plantuml/Containers_ToBe.puml)
+
+[image](/docs/diagrams)
 
 **Диаграмма компонентов (Components)**
 
-Добавьте диаграмму для каждого из выделенных микросервисов.
+- Device Management
+  - [plantuml](/docs/plantuml/Components_DeviceManagement.puml)
+  - [image](/docs/diagrams)
+- Location Management
+  - [plantuml](/docs/plantuml/Components_LocationManagement.puml)
+  - [image](/docs/diagrams)
+- Scenario Management
+  - [plantuml](/docs/plantuml/Components_ScenarioManagement.puml)
+  - [image](/docs/diagrams)
+- Scenario Engine
+  - [plantuml](/docs/plantuml/Components_ScenarioEngine.puml)
+  - [image](/docs/diagrams)
+- Vendor Management
+  - [plantuml](/docs/plantuml/Components_VendorManagement.puml)
+  - [image](/docs/diagrams)
 
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+- Добавление устройства
+  - [plantuml](/docs/plantuml/SequenceDiagram_AddDevice.puml)
+  - [image](/docs/diagrams)
+- Чтение показаний устройства
+  - [plantuml](/docs/plantuml/SequenseDiagram_ReadTelemetry.puml)
+  - [image](/docs/diagrams)
+
 
 # Задание 3. Разработка ER-диаграммы
 
-Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
+- [plantuml](/docs/plantuml/ER_Diagram.puml)
+- [image](/docs/plantuml/diagrams/)
 
 # Задание 4. Создание и документирование API
 

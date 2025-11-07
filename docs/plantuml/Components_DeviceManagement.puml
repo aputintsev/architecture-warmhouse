@@ -22,6 +22,7 @@ Container(deviceManagement, "Микросервис управления уст�
     ComponentQueue(queryQueue, "Очередь запросов", "Очередь запросов к устройствам")
     Component(commandProcessor, "Обработчик команд", "Обработчик команд управления устройствами - добавление/удаление устройств, изменение состояния")
     Component(queryProcessor, "Обработчик запросов", "Обработчик запросов к устройствам - чтение показаний, состояния")
+    Component(thirdPartyApiConverter, "Конвертер в формат внешней системы", "Конвертирует запросы к внешней системе в ожидаемый ею формат")
     Component(deviceRepository, "DeviceRepository", "Репозиторий для работы с БД")
 }
 
@@ -37,7 +38,8 @@ Rel(deviceMonitor, queryQueue, "Отправляет устройствам за
 Rel(deviceMonitor, deviceRepository, "Сохраняет показания в БД")
 Rel(commandQueue, commandProcessor, "Читает из очереди сообщений команду")
 Rel(queryQueue, queryProcessor, "Читает из очереди сообщений запрос")
-Rel(commandProcessor, externalApi, "Отправляет устройствам команды (изменение состояния, регистрация устройств)")
-Rel(queryProcessor, externalApi, "Отправляет устройствам запросы на чтение состояния, показаний")
+Rel(commandProcessor, thirdPartyApiConverter, "Отправляет устройствам команды (изменение состояния, регистрация устройств)")
+Rel(queryProcessor, thirdPartyApiConverter, "Отправляет устройствам запросы на чтение состояния, показаний")
+Rel(thirdPartyApiConverter, externalApi, "Отправляет/принимает запросы в/из внешнюю систему")
 
 @enduml

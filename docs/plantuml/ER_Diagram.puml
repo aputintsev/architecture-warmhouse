@@ -18,12 +18,12 @@ entity "House" {
 entity "Device" {
   * device_id : NUMBER
   --
-  type_id : NUMBER
+  device_type_id : NUMBER
   house_id : NUMBER
   vendor_id : NUMBER
   name : VARCHAR
   serial_number : VARCHAR
-  status : NUMBER
+  status : VARCHAR
 }
 
 entity "DeviceType" {
@@ -47,6 +47,7 @@ entity "TelemetryData" {
   device_id : NUMBER
   module_id : NUMBER
   data : JSONB
+  created_at: TIMESTAMP
 }
 
 entity "Scenario" {

@@ -13,7 +13,7 @@ Boundary(smartHomeSystem, "Smart_Home System") {
         Container(webApp, "Веб-приложение", "Пользовательский интерфейс")
         Container(backofficeApp, "Веб-приложение администратора", "Административный интерфейс")
     }
-    Container(loadBalancer, "Балансировщик нагрузки", "Балансирует соединения")
+    Container(loadBalancer, "Балансировщик нагрузки", "Балансирует соединения. Например, nginx")
     Boundary(manageVendorsSystem, "Управление вендорами") {
         Container(vendorManagement, "Управление вендорами", "CRUD-операции для списка вендоров")
         ContainerDb(vendorsDb, "Vendors DB", "Хранит список вендоров")
