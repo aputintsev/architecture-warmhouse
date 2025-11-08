@@ -7,14 +7,37 @@ from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 
-@app.route('/temperature', methods=['GET'])
+@app.get('/temperature')
 def get_temperature_by_location():
     location = request.args.get('location')
-    return measure_temperature(None, location), 200
+    sensor_id: str | None = None
+    match location:
+        case 'Living Room':
+            sensor_id = '1'
+        case 'Bedroom':
+            sensor_id = '2'
+        case 'Kitchen':
+            sensor_id = '3'
+        case _:
+            sensor_id = '0'
 
-@app.route('/temperature/<sensor_id>', methods=['GET'])
+    return measure_temperature(sensor_id, location), 200
+
+@app.get('/temperature/<sensor_id>')
 def get_temperature_by_sensor_id(sensor_id):
-    return measure_temperature(sensor_id, None), 200
+    location = request.args.get('location')
+    if location is None or location == '':
+        match sensor_id:
+            case '1':
+                location = 'Living Room'
+            case '2':
+                location = 'Bedroom'
+            case '3':
+                location = 'Kitchen'
+            case _:
+                location = 'Unknown'
+
+    return measure_temperature(sensor_id, location), 200
 
 
 def measure_temperature(sensor_id, location) -> Response:
@@ -22,11 +45,11 @@ def measure_temperature(sensor_id, location) -> Response:
         'value': round(random.uniform(-30.0, 30.0), 1),
         'unit': 'C',
         'timestamp': datetime.now(timezone.utc).isoformat(),
-        'location': location or 'Living Room',
-        'status': 'online',
-        'sensor_id': sensor_id or '1',
+        'location': location or 'Unknown',
+        'status': 'active',
+        'sensor_id': sensor_id or '0',
         'sensor_type': 'temperature',
-        'description': 'Temperature in Living Room'
+        'description': f'Temperature in {location}',
     })
 
 def handle_signal(signum, frame):
