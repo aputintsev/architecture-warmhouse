@@ -1,0 +1,101 @@
+asyncapi: 3.0.0
+info:
+  title: Smart Home Device Management Async API
+  version: 1.0.0
+  description: |
+    Асинхронные сообщения Kafka для микросервиса "Управление устройствами".
+    Охватывает очереди команд и запросов:
+    - commands.* — команды управления устройствами (регистрация, включение/выключение, установка параметров)
+    - queries.* — запросы к устройствам (чтение состояния/показаний) и ответы
+
+servers:
+  kafka-local:
+    host: localhost:9092
+    protocol: kafka-secure
+    description: Локальный брокер Kafka
+
+operations:
+  publishRegisterDevice:
+    action: send
+    channel:
+      $ref: '#/channels/commands.device.register'
+  publishReadDeviceTelemetryEvent:
+    action: send
+    channel:
+      $ref: '#/channels/queries.device.readTelemetry'
+
+channels:
+  commands.device.register:
+    description: Команда регистрации нового устройства в системе
+    address: command_device_register
+    messages:
+      DeviceRegisterCommand:
+        $ref: '#/components/messages/DeviceRegisterCommand'
+  queries.device.readTelemetry:
+    description: Запрос на чтение телеметрии/показаний устройства
+    address: query_device_read_telemetry
+    messages:
+      DeviceReadTelemetryQuery:
+        $ref: '#/components/messages/DeviceReadTelemetryEvent'
+
+components:
+  messages:
+    DeviceRegisterCommand:
+      payload:
+        type: object
+        properties:
+          device_type_id:
+            type: integer
+            description: Идентификатор типа устройства
+          house_id:
+            type: integer
+            description: Идентификатор дома
+          vendor_id:
+            type: integer
+            description: Идентификатор производителя
+          external_id:
+            type: string
+            description: Внешний идентификатор устройства в системе производителя
+          name:
+            type: string
+            description: Отображаемое название устройства
+          serial_number:
+            type: string
+            description: Серийный номер устройства
+      examples:
+        - name: sampleRegister
+          summary: Пример команды регистрации устройства
+          payload:
+            device_type_id: 2
+            house_id: 12
+            vendor_id: 7
+            name: "Термостат"
+            serial_number: "THERM-4582-AB"
+    DeviceReadTelemetryEvent:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+            description: Идентификатор устройства (внутренний)
+          device_type_id:
+            type: integer
+            description: Идентификатор типа устройства
+          house_id:
+            type: integer
+            description: Идентификатор дома
+          vendor_id:
+            type: integer
+            description: Идентификатор производителя
+          external_id:
+            type: string
+            description: Внешний идентификатор устройства в системе производителя
+      examples:
+        - name: sampleReadTelemetry
+          summary: Пример запроса на чтение телеметрии устройства
+          payload:
+            device_id: 102
+            device_type_id: 2
+            house_id: 12
+            vendor_id: 7
+            external_id: "EXT-1234"

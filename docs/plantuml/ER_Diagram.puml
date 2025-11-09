@@ -21,6 +21,7 @@ entity "Device" {
   device_type_id : NUMBER
   house_id : NUMBER
   vendor_id : NUMBER
+  external_id : VARCHAR
   name : VARCHAR
   serial_number : VARCHAR
   status : VARCHAR

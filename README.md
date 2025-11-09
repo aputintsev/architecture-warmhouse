@@ -62,7 +62,7 @@
 
 ### 5. Визуализация контекста системы — диаграмма С4
 
-[SmartHome Context Diagram - As Is](/docs/diagrams/Context_AsIs-SmartHome_Context_Diagram.png)
+![SmartHome Context Diagram - As Is](/docs/diagrams/Context_AsIs-SmartHome_Context_Diagram.png)
 
 # Задание 2. Проектирование микросервисной архитектуры
 
@@ -72,50 +72,55 @@
 
 [plantuml](/docs/plantuml/Containers_ToBe.puml)
 
-[image](/docs/diagrams)
+![image](/docs/diagrams/Containers_ToBe.png)
 
 **Диаграмма компонентов (Components)**
 
 - Device Management
   - [plantuml](/docs/plantuml/Components_DeviceManagement.puml)
-  - [image](/docs/diagrams)
+  ![image](/docs/diagrams/Components_DeviceManagement.png)
 - Location Management
   - [plantuml](/docs/plantuml/Components_LocationManagement.puml)
-  - [image](/docs/diagrams)
+  ![image](/docs/diagrams/Components_LocationManagement.png)
 - Scenario Management
   - [plantuml](/docs/plantuml/Components_ScenarioManagement.puml)
-  - [image](/docs/diagrams)
+  ![image](/docs/diagrams/Components_ScenarioManagement.png)
 - Scenario Engine
   - [plantuml](/docs/plantuml/Components_ScenarioEngine.puml)
-  - [image](/docs/diagrams)
+  ![image](/docs/diagrams/Components_ScenarioEngine.png)
 - Vendor Management
   - [plantuml](/docs/plantuml/Components_VendorManagement.puml)
-  - [image](/docs/diagrams)
+  ![image](/docs/diagrams/Components_VendorManagement.png)
 
 **Диаграмма кода (Code)**
 
 - Добавление устройства
   - [plantuml](/docs/plantuml/SequenceDiagram_AddDevice.puml)
-  - [image](/docs/diagrams)
+  ![image](/docs/diagrams/SequenceDiagram_AddDevice.png)
 - Чтение показаний устройства
   - [plantuml](/docs/plantuml/SequenseDiagram_ReadTelemetry.puml)
-  - [image](/docs/diagrams)
+  ![image](/docs/diagrams/SequenseDiagram_ReadTelemetry.png)
 
 
 # Задание 3. Разработка ER-диаграммы
 
-- [plantuml](/docs/plantuml/ER_Diagram.puml)
-- [image](/docs/plantuml/diagrams/)
+[plantuml](/docs/plantuml/ER_Diagram.puml)
+![image](/docs/diagrams/ER_Diagram.png)
 
 # Задание 4. Создание и документирование API
 
 ### 1. Тип API
 
-Укажите, какой тип API вы будете использовать для взаимодействия микросервисов. Объясните своё решение.
+Взаимодействие между нашими микросервисами будет осуществляться по REST API, поскольку большая часть операций у нас синхронна (например, весь CRUD).
+Для взаимодействия с внешними устройствами будем использовать асинхронный подход с использованием Kafka. Это позволит не занимать ресурсы, ожидая 
+синхронных ответов, которые могут задерживаться из-за плохого интернета, проблем на стороне вендора или еще каких-то причин.
 
 ### 2. Документация API
 
 Здесь приложите ссылки на документацию API для микросервисов, которые вы спроектировали в первой части проектной работы. Для документирования используйте Swagger/OpenAPI или AsyncAPI.
+
+- [OpenAPI](/docs/api/swagger.yml)
+- [AsyncAPI](/docs/api/asyncapi.yml)
 
 # Задание 5. Работа с docker и docker-compose
 

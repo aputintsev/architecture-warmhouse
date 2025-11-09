@@ -10,7 +10,7 @@ participant API as api
 participant SessionManagement as session
 participant ServiceLayer as service
 participant DeviceMonitor as monitor
-queue QueryQueue as q
+queue Kafka as kafka
 participant QueryProcessor as processor
 participant ApiConverter as converter
 participant ExternalApi as extApi
@@ -19,19 +19,21 @@ participant RepositoryLayer as repository
 user -> api++: Прочитать показания\n устройства с deviceId
 api -> session++: Проверка авторизации
 session -->> api--: Ok
-api -> service++: Прочитать показания\n устройства с deviceId
+api -> service++: Валидация запроса и \nперенаправление в сервисный слой
+service -> kafka: Публикация запроса на \nчтение показаний устройства\n (далее см "Фоновый процесс обновления показаний")
 service -> repository++: Прочесть показания\n устройства с deviceId из БД
 repository -->> service--: Показания устройства
-service -->> api--++: Показания устройства
+service -->> api--: Показания устройства
 api -->> user--: Показания устройства
 group Фоновый процесс обновления показаний
-    monitor ->> q: Прочитать показания\n устройства с deviceId
-    q -> processor++: Прочитать показания\n устройства с deviceId
-    processor -> converter++: Преобразовать команду в \nформат вендора
-    converter -->> processor--: Команда, понятная вендору
-    processor -> extApi++: Прочитать показания
+    monitor ->> kafka: Периодически по крону публикуется \nзапрос на чтение показаний\n устройства с deviceId
+    kafka -> processor++: Читает событие из очереди
+    processor -> converter++: Преобразовать запрос в \nформат вендора
+    converter -->> processor--: Запрос, понятный вендору
+    processor -> extApi++: Прочитать показания из системы вендора
     extApi -->> processor--: Показания устройства
-    processor -->> monitor--++: Показания устройства
+    processor -->> kafka--: Публикация события о завершении\n чтения показаний устройства
+    kafka -->> monitor--++: Чтение события с \nпоказаниями устройства
     monitor -> repository++: Запись показаний в БД
     repository -->> monitor--: Показания сохранены
 end
