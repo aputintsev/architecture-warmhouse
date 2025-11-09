@@ -1,0 +1,88 @@
+@startuml
+
+entity "User" {
+  * user_id : NUMBER
+  --
+  username : VARCHAR
+  email : VARCHAR
+  password : VARCHAR
+}
+
+entity "House" {
+  * house_id : NUMBER
+  --
+  user_id : NUMBER
+  name : VARCHAR
+}
+
+entity "Device" {
+  * device_id : NUMBER
+  --
+  device_type_id : NUMBER
+  house_id : NUMBER
+  vendor_id : NUMBER
+  external_id : VARCHAR
+  name : VARCHAR
+  serial_number : VARCHAR
+  status : VARCHAR
+}
+
+entity "DeviceType" {
+  * device_type_id : NUMBER
+  --
+  name : VARCHAR
+}
+
+entity "Module" {
+  * module_id : NUMBER
+  --
+  house_id : NUMBER
+  vendor_id : NUMBER
+  name : VARCHAR
+  serial_number : VARCHAR
+}
+
+entity "TelemetryData" {
+  * telemetry_data_id : NUMBER
+  --
+  device_id : NUMBER
+  module_id : NUMBER
+  data : JSONB
+  created_at: TIMESTAMP
+}
+
+entity "Scenario" {
+  * scenario_id : NUMBER
+  --
+  user_id : NUMBER
+  script : JSONB
+}
+
+entity "Vendor" {
+  * vendor_id : NUMBER
+  --
+  name : VARCHAR
+  api_url: VARCHAR
+}
+
+entity "UserVendorAuthData" {
+  * user_vendor_auth_data_id : NUMBER
+  --
+  user_id : NUMBER
+  vendor_id : NUMBER
+  auth_key : VARCHAR
+}
+
+User ||--o{ House
+House ||--o{ Device
+House ||--o{ Module
+Device ||--o{ TelemetryData
+Device ||--|| DeviceType
+Module ||--o{ TelemetryData
+User ||--o{ Scenario
+Vendor ||--o{ Device
+Vendor ||--o{ Module
+Vendor ||--|| UserVendorAuthData
+User ||--|| UserVendorAuthData
+
+@enduml

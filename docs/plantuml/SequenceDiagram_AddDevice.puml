@@ -1,0 +1,34 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+== Добавление нового устройства ==
+
+actor User as user
+participant API as api
+participant SessionManagement as session
+participant ServiceLayer as service
+queue Kafka as kafka
+participant CommandProcessor as processor
+participant ApiConverter as converter
+participant ExternalApi as extApi
+participant RepositoryLayer as repository
+
+user -> api++: Добавить устройство
+api -> session++: Проверка авторизации
+session -->> api--: Ok
+api -> service--++: Валидация запроса и \nперенаправление в сервисный слой
+service ->> kafka--: Публикация события \nо добавлении нового устройства
+kafka -> processor++: Читает событие из очереди
+processor -> converter++: Преобразовать команду \nв формат вендора
+converter -->> processor--: Команда, понятная вендору
+processor -> extApi++: Отправка вендору запроса\n на добавление устройства
+extApi -->> processor--: Устройство добавлено
+processor -->> kafka--: Публикация события \n"устройство добавлено"
+kafka -->> service++: Чтение события \n"устройство добавлено"
+service -> repository++: Запись устройства в БД
+repository -->> service--: Устройство сохранено
+service -->> api--: Устройство добавлено
+api -->> user--: Устройство добавлено
+@enduml

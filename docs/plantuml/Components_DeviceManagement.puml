@@ -1,0 +1,45 @@
+@startuml
+title Device Management Component Diagram
+
+top to bottom direction
+
+!include <C4/C4_Component>
+
+Container_Boundary(smartHomeSystem, "SmartHome System") {
+    Container(loadBalancer, "Балансировщик нагрузки", "Балансирует соединения")
+    Container(scenarioEngine, "Движок сценариев", "Исполняет сценарии, отдает команды устройствам")
+    Container(sessionManagement, "Управление сессией", "Управление пользовательской сессией, контроль доступа")
+    Container(deviceManagement, "Микросервис управления устройствами")
+    ContainerDb(devicesDb, "Devices DB")
+}
+Container_Ext(externalApi, "Third-Party API", "Внешняя экосистема стороннего поставщика")
+
+Container(deviceManagement, "Микросервис управления устройствами") {
+    Component(apiLayer, "API", "Слой API для управления устройствами")
+    Component(serviceLayer, "DeviceService", "Слой бизнес-логики")
+    Component(deviceMonitor, "DeviceMonitor", "Монитор состояния/показаний устройств")
+    ComponentQueue(commandQueue, "Очередь команд", "Очередь команд устройствам")
+    ComponentQueue(queryQueue, "Очередь запросов", "Очередь запросов к устройствам")
+    Component(commandProcessor, "Обработчик команд", "Обработчик команд управления устройствами - добавление/удаление устройств, изменение состояния")
+    Component(queryProcessor, "Обработчик запросов", "Обработчик запросов к устройствам - чтение показаний, состояния")
+    Component(thirdPartyApiConverter, "Конвертер в формат внешней системы", "Конвертирует запросы к внешней системе в ожидаемый ею формат")
+    Component(deviceRepository, "DeviceRepository", "Репозиторий для работы с БД")
+}
+
+Rel(loadBalancer, apiLayer, "Создает и редактирует устройства по запросу пользователя")
+Rel(scenarioEngine, apiLayer, "Управляет состоянием устройств, запрашивает показания")
+Rel(apiLayer, sessionManagement, "Авторизует операцию пользователя")
+Rel(apiLayer, serviceLayer, "Валидирует запрос и перенаправляет его в сервисный слой")
+Rel(serviceLayer, deviceRepository, "Сохраняет/изменяет/читает данные в БД")
+Rel(deviceRepository, devicesDb, "Сохраняет/изменяет/читает данные в БД")
+Rel(serviceLayer, commandQueue, "Кладет в очередь сообщений команды (изменение состояния, регистрация устройств)")
+Rel(serviceLayer, queryQueue, "Отправляет устройствам запросы на чтение состояния, показаний")
+Rel(deviceMonitor, queryQueue, "Отправляет устройствам запросы на чтение состояния, показаний")
+Rel(deviceMonitor, deviceRepository, "Сохраняет показания в БД")
+Rel(commandQueue, commandProcessor, "Читает из очереди сообщений команду")
+Rel(queryQueue, queryProcessor, "Читает из очереди сообщений запрос")
+Rel(commandProcessor, thirdPartyApiConverter, "Отправляет устройствам команды (изменение состояния, регистрация устройств)")
+Rel(queryProcessor, thirdPartyApiConverter, "Отправляет устройствам запросы на чтение состояния, показаний")
+Rel(thirdPartyApiConverter, externalApi, "Отправляет/принимает запросы в/из внешнюю систему")
+
+@enduml

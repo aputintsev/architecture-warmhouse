@@ -1,0 +1,259 @@
+openapi: 3.0.0
+info:
+  title: Smart Home API
+  version: 1.0.0
+  description: Smart Home system API.
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+paths:
+  /devices:
+    get:
+      summary: Получить список устройств
+      description: Возвращает список устройств
+      parameters:
+        - name: device_type_id
+          in: query
+          description: Фильтр по типу устройства
+          required: false
+          schema:
+            type: integer
+        - name: house_id
+          in: query
+          description: Фильтр по id дома, для которого запрашиваем список устройств
+          required: false
+          schema:
+            type: integer
+        - name: vendor_id
+          in: query
+          description: Фильтр по id производителя устройства
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список устройств
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+              examples:
+                sampleList:
+                  summary: Пример списка устройств
+                  value:
+                    - device_id: 101
+                      device_type_id: 1
+                      house_id: 12
+                      vendor_id: 5
+                      external_id: "vendor-abc-101"
+                      name: "Лампа в гостиной"
+                      serial_number: "LAMP-0001-XYZ"
+                      status: "on"
+                    - device_id: 102
+                      device_type_id: 2
+                      house_id: 12
+                      vendor_id: 7
+                      external_id: "vendor-therm-102"
+                      name: "Термостат"
+                      serial_number: "THERM-4582-AB"
+                      status: "idle"
+                    - device_id: 205
+                      device_type_id: 3
+                      house_id: 27
+                      vendor_id: 5
+                      external_id: "vendor-sens-205"
+                      name: "Датчик движения на входе"
+                      serial_number: "SENS-7733-QW"
+                      status: "active"
+        '400':
+          description: Некорректный формат запроса
+        '500':
+          description: Внутренняя ошибка сервера
+    post:
+      summary: Добавить новое устройство
+      description: Добавляет в систему новое устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDeviceRequest'
+            examples:
+              sampleCreate:
+                summary: Пример запроса на добавление устройства
+                value:
+                  device_type_id: 2
+                  house_id: 12
+                  vendor_id: 7
+                  external_id: "vendor-therm-102"
+                  name: "Термостат"
+                  serial_number: "THERM-4582-AB"
+      responses:
+        '201':
+          description: Устройство успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+              examples:
+                sampleCreated:
+                  summary: Пример ответа при успешном создании
+                  value:
+                    device_id: 102
+                    device_type_id: 2
+                    house_id: 12
+                    vendor_id: 7
+                    external_id: "vendor-therm-102"
+                    name: "Термостат"
+                    serial_number: "THERM-4582-AB"
+                    status: "idle"
+        '400':
+          description: Некорректный формат запроса
+        '500':
+          description: Внутренняя ошибка сервера
+  /devices/{device_id}:
+    get:
+      summary: Поучение информации об устройстве
+      description: Возвращает информацию об устройстве по его идентификатору
+      parameters:
+        - in: path
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: ID устройства
+      responses:
+        '200':
+          description: Информация об устройстве
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+              examples:
+                sampleDevice:
+                  summary: Пример устройства
+                  value:
+                    device_id: 102
+                    device_type_id: 2
+                    house_id: 12
+                    vendor_id: 7
+                    external_id: "vendor-therm-102"
+                    name: "Термостат"
+                    serial_number: "THERM-4582-AB"
+                    status: "idle"
+        '404':
+          description: Устройство не найдено.
+        '500':
+          description: Внутренняя ошибка сервера
+  /devices/{device_id}/command:
+    post:
+      summary: Отправка команды на устройство
+      description: Отправляет устройству команду
+      parameters:
+        - in: path
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: ID устройства
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCommand'
+            examples:
+              turnOnExample:
+                summary: Включить устройство
+                value:
+                  command: "turn_on"
+                  value: 1
+              setTempExample:
+                summary: Установить температуру
+                value:
+                  command: "set_temperature"
+                  value: 22
+      responses:
+        '204':
+          description: Команда успешно отправлена
+        '400':
+          description: Некорректный формат запроса
+        '404':
+          description: Устройство не найдено.
+        '500':
+          description: Внутренняя ошибка сервера
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        device_id:
+          type: integer
+          description: Идентификатор устройства
+        device_type_id:
+          type: integer
+          description: Идентификатор типа устройства
+        house_id:
+          type: integer
+          description: Идентификатор дома, к которому относится устройство
+        vendor_id:
+          type: integer
+          description: Идентификатор производителя устройства
+        external_id:
+          type: string
+          description: Идентификатор устройства в экосистеме производителя
+        name:
+          type: string
+          description: Имя устройства
+        serial_number:
+          type: string
+          description: Серийный номер устройства
+        status:
+          type: string
+          description: Состояние устройства
+      required:
+        - device_id
+        - device_type_id
+        - house_id
+        - vendor_id
+        - external_id
+        - name
+        - serial_number
+        - status
+    AddDeviceRequest:
+      type: object
+      properties:
+        device_type_id:
+          type: integer
+          description: Идентификатор типа устройства
+        house_id:
+          type: integer
+          description: Идентификатор дома, к которому относится устройство
+        vendor_id:
+          type: integer
+          description: Идентификатор производителя устройства
+        external_id:
+          type: string
+          description: Идентификатор устройства в экосистеме производителя
+        name:
+          type: string
+          description: Имя устройства
+        serial_number:
+          type: string
+          description: Серийный номер устройства
+      required:
+        - device_type_id
+        - house_id
+        - vendor_id
+        - name
+        - serial_number
+    DeviceCommand:
+      type: object
+      properties:
+        command:
+          type: string
+          description: Команда, которую должно исполнить устройство
+        value:
+          type: number
+          description: Числовое значение, связанное с командой (например, температура или уровень яркости)

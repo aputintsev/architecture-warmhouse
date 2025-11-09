@@ -1,0 +1,29 @@
+@startuml
+title Scenario Management Component Diagram
+
+top to bottom direction
+
+!include <C4/C4_Component>
+
+Container_Boundary(smartHomeSystem, "SmartHome System") {
+    Container(loadBalancer, "Балансировщик нагрузки", "Балансирует соединения")
+    Container(scenarioEngine, "Движок сценариев", "Исполняет сценарии, отдает команды устройствам")
+    Container(sessionManagement, "Управление сессией", "Управление пользовательской сессией, контроль доступа")
+    Container(scenarioManagement, "Микросервис управления сценариями")
+    ContainerDb(scenariosDb, "Scenarios DB")
+}
+
+Container(scenarioManagement, "Микросервис управления сценариями") {
+    Component(apiLayer, "API", "Слой API для управления сценариями")
+    Component(serviceLayer, "ScenarioService", "Слой бизнес-логики")
+    Component(scenarioRepository, "ScenarioRepository", "Репозиторий для работы с БД")
+}
+
+Rel(loadBalancer, apiLayer, "Создает и редактирует сценарии по запросу пользователя")
+Rel(scenarioEngine, apiLayer, "Читает сценарии")
+Rel(apiLayer, sessionManagement, "Авторизует операцию пользователя")
+Rel(apiLayer, serviceLayer, "Валидирует запрос и перенаправляет его в сервисный слой")
+Rel(serviceLayer, scenarioRepository, "Сохраняет/изменяет/читает данные в БД")
+Rel(scenarioRepository, scenariosDb, "Сохраняет/изменяет/читает данные в БД")
+
+@enduml

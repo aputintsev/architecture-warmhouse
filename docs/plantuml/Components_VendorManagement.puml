@@ -1,0 +1,28 @@
+@startuml
+title Vendor Management Component Diagram
+
+top to bottom direction
+
+!include <C4/C4_Component>
+
+Container_Boundary(smartHomeSystem, "SmartHome System") {
+    Container(loadBalancer, "Балансировщик нагрузки", "Балансирует соединения")
+    Container(scenarioEngine, "Движок сценариев", "Исполняет сценарии, отдает команды устройствам")
+    Container(sessionManagement, "Управление сессией", "Управление пользовательской сессией, контроль доступа")
+    Container(vendorManagement, "Микросервис управления вендорами")
+    ContainerDb(vendorsDb, "Vendors DB")
+}
+
+Container(vendorManagement, "Микросервис управления вендорами") {
+    Component(apiLayer, "API", "Слой API для управления вендорами")
+    Component(serviceLayer, "VendorService", "Слой бизнес-логики")
+    Component(vendorRepository, "VendorRepository", "Репозиторий для работы с БД")
+}
+
+Rel(loadBalancer, apiLayer, "Создает и редактирует вендоров по запросу пользователя")
+Rel(apiLayer, sessionManagement, "Авторизует операцию пользователя")
+Rel(apiLayer, serviceLayer, "Валидирует запрос и перенаправляет его в сервисный слой")
+Rel(serviceLayer, vendorRepository, "Сохраняет/изменяет/читает данные в БД")
+Rel(vendorRepository, vendorsDb, "Сохраняет/изменяет/читает данные в БД")
+
+@enduml
